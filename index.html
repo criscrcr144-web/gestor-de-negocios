@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Inventario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Mi Inventario</div>
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab is-active" data-view="inventario">Inventario</button>
+      <button class="tab" data-view="ventas">Ventas</button>
+      <button class="tab" data-view="reportes">Reportes</button>
+      <button class="tab" data-view="calculadora">Calculadora</button>
+    </nav>
+  </header>
+
+  <!-- Alertas de stock bajo: se llena desde app.js -->
+  <div id="alerts" class="alerts" role="status" hidden></div>
+
+  <main>
+
+    <!-- ============ INVENTARIO ============ -->
+    <section id="view-inventario" class="view">
+      <div class="summary">
+        <div><span class="sum-label">Productos</span><strong id="sum-products">0</strong></div>
+        <div><span class="sum-label">Invertido en stock</span><strong id="sum-cost">$0.00</strong></div>
+        <div><span class="sum-label">Valor de venta del stock</span><strong id="sum-retail">$0.00</strong></div>
+        <div><span class="sum-label">Ganancia potencial</span><strong id="sum-profit">$0.00</strong></div>
+      </div>
+
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Buscar producto o categoría" aria-label="Buscar producto">
+        <select id="filter" aria-label="Filtrar por estado">
+          <option value="all">Todos</option>
+          <option value="low">Por agotarse y agotados</option>
+          <option value="out">Solo agotados</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn primary" data-action="new-product">Nuevo producto</button>
+        <details class="menu">
+          <summary class="btn">Datos</summary>
+          <div class="menu-panel">
+            <button data-action="export-csv">Exportar inventario (CSV)</button>
+            <button data-action="export-json">Guardar respaldo (JSON)</button>
+            <button data-action="import-json">Restaurar respaldo</button>
+          </div>
+        </details>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th class="num">Stock</th>
+              <th class="num">Costo</th>
+              <th class="num">Precio</th>
+              <th class="num">Ganancia por unidad</th>
+              <th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="inv-body"></tbody>
+        </table>
+        <div id="inv-empty" class="empty" hidden></div>
+      </div>
+    </section>
+
+    <!-- ============ VENTAS ============ -->
+    <section id="view-ventas" class="view" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Ventas</h2>
+          <p class="muted">Cada venta descuenta el stock y guarda el costo y el precio de ese momento.</p>
+        </div>
+        <button class="btn primary" data-action="new-sale">Registrar venta</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th class="num">Cantidad</th>
+              <th class="num">Precio</th>
+              <th class="num">Total</th>
+              <th class="num">Ganancia</th>
+              <th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="sales-body"></tbody>
+        </table>
+        <div id="sales-empty" class="empty" hidden>Todavía no hay ventas. Usa “Registrar venta” para anotar la primera.</div>
+      </div>
+    </section>
+
+    <!-- ============ REPORTES ============ -->
+    <section id="view-reportes" class="view" hidden>
+      <div class="section-head">
+        <div>
+          <h2 id="r-title">Lo que más se vende</h2>
+          <p class="muted">Compara tus productos y detecta cuáles no se mueven.</p>
+        </div>
+        <div class="toolbar tight">
+          <label class="inline">Período
+            <select id="r-range">
+              <option value="7">Últimos 7 días</option>
+              <option value="30" selected>Últimos 30 días</option>
+              <option value="90">Últimos 90 días</option>
+              <option value="all">Todo el historial</option>
+            </select>
+          </label>
+          <label class="inline">Ordenar por
+            <select id="r-sort">
+              <option value="units">Unidades vendidas</option>
+              <option value="revenue">Ingresos</option>
+              <option value="profit">Ganancia</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div><span class="sum-label">Unidades vendidas</span><strong id="r-units">0</strong></div>
+        <div><span class="sum-label">Ingresos</span><strong id="r-revenue">$0.00</strong></div>
+        <div><span class="sum-label">Ganancia</span><strong id="r-profit">$0.00</strong></div>
+        <div><span class="sum-label">Margen real</span><strong id="r-margin">—</strong></div>
+      </div>
+
+      <h3>Top 10 productos</h3>
+      <div id="r-top" class="bars"></div>
+
+      <h3>Sin ventas en este período</h3>
+      <div id="r-unsold" class="unsold"></div>
+    </section>
+
+    <!-- ============ CALCULADORA ============ -->
+    <section id="view-calculadora" class="view" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Calculadora de precio y ganancia</h2>
+          <p class="muted">Todo en dólares (USD). Los gastos del lote se reparten entre las unidades.</p>
+        </div>
+      </div>
+
+      <div class="calc">
+        <form id="calc-form" class="calc-form" autocomplete="off">
+          <label>Costo por unidad (USD)
+            <input id="c-cost" type="number" min="0" step="0.01" value="1.00" inputmode="decimal">
+          </label>
+          <label>Cantidad que compras
+            <input id="c-qty" type="number" min="1" step="1" value="10" inputmode="numeric">
+          </label>
+          <label>Otros gastos del lote (envío, impuestos) en USD
+            <input id="c-extra" type="number" min="0" step="0.01" value="0" inputmode="decimal">
+          </label>
+          <label>¿Qué quieres calcular?
+            <select id="c-mode">
+              <option value="margin">Precio para lograr un margen de ganancia</option>
+              <option value="markup">Precio con un recargo sobre el costo</option>
+              <option value="price">Ganancia a partir de un precio que ya tengo</option>
+            </select>
+          </label>
+          <label id="c-target-field"><span id="c-target-label">Margen deseado sobre el precio (%)</span>
+            <input id="c-target" type="number" min="0" step="0.1" value="30" inputmode="decimal">
+          </label>
+          <label id="c-price-field" hidden>Precio de venta por unidad (USD)
+            <input id="c-price" type="number" min="0" step="0.01" value="1.50" inputmode="decimal">
+          </label>
+        </form>
+
+        <div class="calc-out">
+          <div class="tag">
+            <span id="out-caption">Precio de venta por unidad</span>
+            <strong id="out-price">$0.00</strong>
+          </div>
+          <p id="calc-warning" class="warning" hidden></p>
+          <dl class="rows">
+            <div><dt>Costo real por unidad</dt><dd id="out-unit">—</dd></div>
+            <div><dt>Ganancia por unidad</dt><dd id="out-unit-profit">—</dd></div>
+            <div><dt>Margen (sobre el precio)</dt><dd id="out-margin">—</dd></div>
+            <div><dt>Recargo (sobre el costo)</dt><dd id="out-markup">—</dd></div>
+            <div><dt>Inversión total</dt><dd id="out-invest">—</dd></div>
+            <div><dt>Ingreso si vendes todo</dt><dd id="out-revenue">—</dd></div>
+            <div class="strong"><dt>Ganancia total</dt><dd id="out-profit">—</dd></div>
+          </dl>
+          <button class="btn primary" id="btn-calc-add" type="button">Agregar al inventario</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ DIÁLOGOS ============ -->
+
+  <dialog id="product-dialog">
+    <form id="product-form" autocomplete="off">
+      <h2 id="product-title">Nuevo producto</h2>
+      <input type="hidden" id="p-id">
+      <label>Nombre
+        <input id="p-name" required maxlength="80">
+      </label>
+      <label>Categoría (opcional)
+        <input id="p-category" list="cat-list" maxlength="40">
+      </label>
+      <datalist id="cat-list"></datalist>
+      <div class="grid2">
+        <label>Costo por unidad (USD)
+          <input id="p-cost" type="number" min="0" step="0.01" required inputmode="decimal">
+        </label>
+        <label>Precio de venta (USD)
+          <input id="p-price" type="number" min="0" step="0.01" required inputmode="decimal">
+        </label>
+        <label>Stock actual
+          <input id="p-stock" type="number" min="0" step="1" required inputmode="numeric">
+        </label>
+        <label>Alertar con este stock o menos
+          <input id="p-min" type="number" min="0" step="1" required inputmode="numeric">
+        </label>
+      </div>
+      <p id="product-hint" class="hint"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-action="close-dialog">Cancelar</button>
+        <button type="submit" class="btn primary">Guardar producto</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="sale-dialog">
+    <form id="sale-form" autocomplete="off">
+      <h2>Registrar venta</h2>
+      <label>Producto
+        <select id="s-product" required></select>
+      </label>
+      <div class="grid2">
+        <label>Cantidad
+          <input id="s-qty" type="number" min="1" step="1" value="1" required inputmode="numeric">
+        </label>
+        <label>Precio por unidad (USD)
+          <input id="s-price" type="number" min="0" step="0.01" required inputmode="decimal">
+        </label>
+      </div>
+      <p id="sale-hint" class="hint"></p>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-action="close-dialog">Cancelar</button>
+        <button type="submit" class="btn primary">Registrar venta</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="stock-dialog">
+    <form id="stock-form" autocomplete="off">
+      <h2>Agregar stock</h2>
+      <input type="hidden" id="r-id">
+      <p id="r-product" class="muted"></p>
+      <div class="grid2">
+        <label>Unidades que llegan
+          <input id="r-qty" type="number" min="1" step="1" required inputmode="numeric">
+        </label>
+        <label>Nuevo costo por unidad (opcional)
+          <input id="r-cost" type="number" min="0" step="0.01" inputmode="decimal">
+        </label>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn" data-action="close-dialog">Cancelar</button>
+        <button type="submit" class="btn primary">Agregar stock</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
