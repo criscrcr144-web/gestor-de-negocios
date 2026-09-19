@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Inventario — Entrar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="auth">
+    <section class="pitch">
+      <div class="brand ink"><span class="brand-mark" aria-hidden="true"></span>Mi Inventario</div>
+      <h1>Sabe qué tienes, qué se acaba y qué te deja ganancia.</h1>
+      <p class="lead">Control de stock, alertas de productos por agotarse, reportes de lo más vendido y una calculadora de precios en dólares. Pensado para tiendas pequeñas.</p>
+      <div class="tag"><span>Suscripción mensual</span><strong id="pitch-price">$2.99</strong></div>
+      <p class="muted">Pagas por pago móvil, tarjeta de crédito o Binance. Activamos tu cuenta cuando revisamos tu comprobante.</p>
+    </section>
+
+    <section class="auth-card">
+      <div class="switch" role="tablist" aria-label="Acceso">
+        <button type="button" class="is-active" data-mode="login" role="tab" aria-selected="true">Entrar</button>
+        <button type="button" data-mode="register" role="tab" aria-selected="false">Crear cuenta</button>
+      </div>
+
+      <form id="login-form" autocomplete="on">
+        <label>Correo
+          <input id="l-email" type="email" required autocomplete="email">
+        </label>
+        <label>Contraseña
+          <input id="l-password" type="password" required autocomplete="current-password">
+        </label>
+        <button class="btn primary" type="submit">Entrar</button>
+      </form>
+
+      <form id="register-form" autocomplete="on" hidden>
+        <label>Nombre
+          <input id="r-name" required maxlength="80" autocomplete="name">
+        </label>
+        <label>Correo
+          <input id="r-email" type="email" required autocomplete="email">
+        </label>
+        <label>Contraseña (mínimo 8 caracteres)
+          <input id="r-password" type="password" required minlength="8" autocomplete="new-password">
+        </label>
+        <button class="btn primary" type="submit">Crear cuenta</button>
+      </form>
+
+      <p id="auth-error" class="warning" role="alert" hidden></p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="common.js"></script>
+  <script src="auth.js"></script>
+</body>
+</html>

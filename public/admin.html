@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Inventario — Super admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Super admin</div>
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab is-active" data-view="pagos">Pagos <span id="badge-pending" class="badge" hidden>0</span></button>
+      <button class="tab" data-view="suscriptores">Suscriptores</button>
+      <button class="tab" data-view="config">Datos de pago</button>
+      <button class="tab" data-view="cuenta">Mi cuenta</button>
+    </nav>
+    <div class="userbox">
+      <a href="app.html">Ver la app</a>
+      <button id="btn-logout" class="linklike" type="button">Salir</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ============ PAGOS ============ -->
+    <section id="view-pagos" class="view">
+      <div class="section-head">
+        <div>
+          <h2>Pagos por revisar</h2>
+          <p class="muted">Compara la captura y el número de referencia con tu banco o tu Binance. Al aceptar, el suscriptor gana 30 días.</p>
+        </div>
+        <label class="inline">Mostrar
+          <select id="pay-filter">
+            <option value="pending">Solo pendientes</option>
+            <option value="all">Todos</option>
+          </select>
+        </label>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Suscriptor</th><th>Método</th><th>Referencia</th>
+              <th class="num">Monto</th><th>Estado</th><th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="pay-body"></tbody>
+        </table>
+        <div id="pay-empty" class="empty" hidden>No hay pagos para mostrar.</div>
+      </div>
+    </section>
+
+    <!-- ============ SUSCRIPTORES ============ -->
+    <section id="view-suscriptores" class="view" hidden>
+      <div class="summary">
+        <div><span class="sum-label">Suscriptores</span><strong id="st-total">0</strong></div>
+        <div><span class="sum-label">Activos</span><strong id="st-active">0</strong></div>
+        <div><span class="sum-label">Sin pagar o vencidos</span><strong id="st-topay">0</strong></div>
+        <div><span class="sum-label">Bloqueados</span><strong id="st-blocked">0</strong></div>
+        <div><span class="sum-label">Ingresos aprobados</span><strong id="st-revenue">$0.00</strong></div>
+      </div>
+      <div class="toolbar">
+        <input type="search" id="user-search" placeholder="Buscar por nombre o correo" aria-label="Buscar suscriptor">
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Suscriptor</th><th>Estado</th><th>Se registró</th><th><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody id="user-body"></tbody>
+        </table>
+        <div id="user-empty" class="empty" hidden>Todavía no hay suscriptores.</div>
+      </div>
+    </section>
+
+    <!-- ============ DATOS DE PAGO ============ -->
+    <section id="view-config" class="view" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Datos de pago</h2>
+          <p class="muted">Esto es lo que verán tus suscriptores al pagar. Un método vacío se muestra como “no disponible”.</p>
+        </div>
+      </div>
+      <form id="settings-form" class="settings" autocomplete="off">
+        <fieldset>
+          <legend>Suscripción</legend>
+          <div class="grid2">
+            <label>Precio mensual (USD)
+              <input id="st-price" type="number" min="0.5" step="0.01" required>
+            </label>
+            <label>Tasa: bolívares por dólar (opcional)
+              <input id="st-rate" type="number" min="0" step="0.01">
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Pago móvil</legend>
+          <div class="grid2">
+            <label>Banco<input id="pm-bank" maxlength="80" placeholder="Ej: Banesco (0134)"></label>
+            <label>Teléfono<input id="pm-phone" maxlength="40" placeholder="Ej: 0412-1234567"></label>
+            <label>Cédula o RIF<input id="pm-id" maxlength="40" placeholder="Ej: V-12345678"></label>
+            <label>Titular<input id="pm-holder" maxlength="80"></label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Tarjeta de crédito</legend>
+          <label>Enlace de pago (debe empezar con https://)
+            <input id="st-card" type="url" maxlength="500" placeholder="https://...">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Binance</legend>
+          <div class="grid2">
+            <label>Binance Pay ID o correo<input id="bn-id" maxlength="120"></label>
+            <label>Red o moneda<input id="bn-network" maxlength="60" placeholder="Ej: USDT (TRC20)"></label>
+          </div>
+          <label>Nota para el suscriptor (opcional)
+            <input id="bn-note" maxlength="300" placeholder="Ej: Envía el monto exacto y guarda el ID de la transacción">
+          </label>
+        </fieldset>
+
+        <div><button class="btn primary" type="submit">Guardar datos de pago</button></div>
+      </form>
+    </section>
+
+    <!-- ============ MI CUENTA ============ -->
+    <section id="view-cuenta" class="view" hidden>
+      <div class="section-head">
+        <div>
+          <h2>Mi cuenta</h2>
+          <p class="muted">Cambia la contraseña del super admin. Usa una larga y que no uses en otro sitio.</p>
+        </div>
+      </div>
+      <form id="password-form" class="settings" autocomplete="off">
+        <label>Contraseña actual
+          <input id="pw-current" type="password" required autocomplete="current-password">
+        </label>
+        <label>Nueva contraseña (mínimo 10 caracteres)
+          <input id="pw-next" type="password" required minlength="10" autocomplete="new-password">
+        </label>
+        <div><button class="btn primary" type="submit">Cambiar contraseña</button></div>
+      </form>
+    </section>
+
+  </main>
+
+  <dialog id="img-dialog" class="wide">
+    <div class="img-box">
+      <div class="img-head">
+        <strong id="img-title"></strong>
+        <button type="button" class="btn sm" data-action="close-dialog">Cerrar</button>
+      </div>
+      <img id="img-full" alt="Captura del pago">
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="common.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

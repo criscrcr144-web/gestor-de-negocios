@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi Inventario — Suscripción</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Mi Inventario</div>
+    <div class="userbox">
+      <span id="user-email" class="userbox-text"></span>
+      <a id="go-app" href="app.html" hidden>Ir a mi inventario</a>
+      <button id="btn-logout" class="linklike" type="button">Salir</button>
+    </div>
+  </header>
+
+  <main class="narrow">
+    <div id="status" class="status" role="status"></div>
+
+    <section id="pay-section" hidden>
+      <h2>Paga tu suscripción</h2>
+      <p class="muted">Cada pago aprobado suma 30 días de uso. Paga con el método que prefieras, luego sube la captura y el número de referencia.</p>
+
+      <div class="tag small"><span>Monto a pagar</span><strong id="pay-price">$2.99</strong></div>
+
+      <fieldset class="methods">
+        <legend class="sr-only">Método de pago</legend>
+        <label class="method"><input type="radio" name="method" value="pago_movil" checked><span>Pago móvil</span></label>
+        <label class="method"><input type="radio" name="method" value="tarjeta"><span>Tarjeta de crédito</span></label>
+        <label class="method"><input type="radio" name="method" value="binance"><span>Binance</span></label>
+      </fieldset>
+
+      <div id="method-panel" class="method-panel"></div>
+
+      <form id="pay-form" class="pay-form" autocomplete="off">
+        <h3>Envía tu comprobante</h3>
+        <label>Número de referencia del pago
+          <input id="pay-ref" required minlength="4" maxlength="64" placeholder="Ej: 004512389">
+        </label>
+        <label>Captura del pago
+          <input id="pay-file" type="file" accept="image/png,image/jpeg,image/webp" required>
+        </label>
+        <img id="pay-preview" class="preview" alt="Vista previa de la captura" hidden>
+        <p id="pay-error" class="warning" role="alert" hidden></p>
+        <button id="pay-submit" class="btn primary" type="submit">Enviar comprobante</button>
+      </form>
+    </section>
+
+    <section id="history-section" hidden>
+      <h3>Tus pagos</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th><th>Estado</th></tr>
+          </thead>
+          <tbody id="history-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="common.js"></script>
+  <script src="suscripcion.js"></script>
+</body>
+</html>

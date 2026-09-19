@@ -1,0 +1,16 @@
+{
+  "name": "mi-inventario",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gestor de inventario para tiendas pequeñas con suscripción mensual",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "npm": "^12.0.2"
+  }
+}
